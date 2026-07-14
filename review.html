@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>未振り分けボックス｜両足院</title>
+  <title>未振り分けボックス｜両足院・是是</title>
   <style>
     :root { --accent:#2563eb; --bg:#f6f7f9; --line:#e3e6ea; --ink:#1f2430; --muted:#6b7280; }
     * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -36,8 +36,12 @@
 <body>
   <div class="wrap">
     <a class="back" href="./">&larr; アップロード画面へ</a>
-    <h1>🟡 未振り分けボックス（両足院）</h1>
+    <h1>🟡 未振り分けボックス <span id="orgName"></span></h1>
     <p class="sub">AIが判別できなかった書類です。種類と発行/受領を選んで「このフォルダへ移動」を押すと、正しいフォルダへ移動・リネームされます。</p>
+    <div class="seg" id="orgSeg" style="margin:0 0 12px;">
+      <button type="button" data-org="ryosokuin" onclick="pickOrg('ryosokuin')">両足院</button>
+      <button type="button" data-org="xexe" onclick="pickOrg('xexe')">是是</button>
+    </div>
     <button class="reload" onclick="load()">🔄 一覧を更新</button>
     <div id="list"><div class="loading">読み込み中…</div></div>
   </div>
@@ -45,14 +49,29 @@
   <script>
     // credentials:'omit' が肝。Cookieを送らず匿名としてGASにアクセスするので、
     // Googleの「複数ログインでGASページが開けない」バグの影響を受けない。
-    var GAS_URL = 'PASTE_RYOSOKUIN_GAS_EXEC_URL';
+    var ORGS = {
+      ryosokuin: { label: '両足院', url: 'PASTE_RYOSOKUIN_GAS_EXEC_URL' },
+      xexe:      { label: '是是',   url: 'PASTE_XEXE_GAS_EXEC_URL' }
+    };
+    var org = new URLSearchParams(location.search).get('org') || localStorage.getItem('keiri_org') || 'ryosokuin';
+    if (!ORGS[org]) org = 'ryosokuin';
+    function GAS_URL_() { return ORGS[org].url; }
+    function pickOrg(o) {
+      org = o;
+      try { localStorage.setItem('keiri_org', o); } catch (e) {}
+      document.querySelectorAll('#orgSeg button').forEach(function (b) {
+        b.classList.toggle('on', b.getAttribute('data-org') === o);
+      });
+      document.getElementById('orgName').textContent = '（' + ORGS[o].label + '）';
+      load();
+    }
     var CATS = [], DIRMAP = {}, state = {};
 
     function apiGet(params) {
-      return fetch(GAS_URL + '?' + params, { credentials: 'omit' }).then(function(r){ return r.json(); });
+      return fetch(GAS_URL_() + '?' + params, { credentials: 'omit' }).then(function(r){ return r.json(); });
     }
     function apiPost(fields) {
-      return fetch(GAS_URL, { method: 'POST', credentials: 'omit', body: new URLSearchParams(fields) })
+      return fetch(GAS_URL_(), { method: 'POST', credentials: 'omit', body: new URLSearchParams(fields) })
         .then(function(r){ return r.json(); });
     }
 
@@ -129,7 +148,7 @@
       });
     }
 
-    load();
+    pickOrg(org);
   </script>
 </body>
 </html>

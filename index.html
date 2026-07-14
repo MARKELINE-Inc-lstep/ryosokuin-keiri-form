@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>経理書類アップロード｜両足院</title>
+  <title>経理書類アップロード｜両足院・是是</title>
   <style>
     :root { --accent:#2563eb; --bg:#f6f7f9; --line:#e3e6ea; --ink:#1f2430; --muted:#6b7280; }
     * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -43,11 +43,17 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>📂 経理書類アップロード（両足院）</h1>
+    <h1>📂 経理書類アップロード <span id="orgName"></span></h1>
     <p class="sub">種類と「発行/受領」を選んでファイルを送るだけ。自動で正しいフォルダに保存されます。</p>
 
     <div class="card">
       <form id="f">
+        <label>どちらの書類ですか？ <span class="req">必須</span></label>
+        <div class="seg" id="orgSeg" style="margin-bottom:16px;">
+          <button type="button" data-org="ryosokuin" onclick="pickOrg('ryosokuin')">両足院</button>
+          <button type="button" data-org="xexe" onclick="pickOrg('xexe')">是是</button>
+        </div>
+
         <label>書類の種類 <span class="req">必須</span></label>
         <select id="category" required><option value="">選択してください</option></select>
 
@@ -83,7 +89,7 @@
   <!-- GASへ確実に届ける隠しフォーム＋iフレーム（fetchを使わずCORSを回避） -->
   <iframe name="sink" id="sink" style="display:none"></iframe>
   <form id="gform" method="POST"
-        action="PASTE_RYOSOKUIN_GAS_EXEC_URL"
+        action=""
         target="sink" style="display:none">
     <input type="hidden" name="category" id="h_category">
     <input type="hidden" name="direction" id="h_direction">
@@ -95,6 +101,23 @@
   </form>
 
   <script>
+    // ▼ 組織ごとのGAS /exec URL（設置時に置換）
+    var ORGS = {
+      ryosokuin: { label: '両足院', url: 'PASTE_RYOSOKUIN_GAS_EXEC_URL' },
+      xexe:      { label: '是是',   url: 'PASTE_XEXE_GAS_EXEC_URL' }
+    };
+    var org = new URLSearchParams(location.search).get('org') || localStorage.getItem('keiri_org') || 'ryosokuin';
+    if (!ORGS[org]) org = 'ryosokuin';
+    function pickOrg(o) {
+      org = o;
+      try { localStorage.setItem('keiri_org', o); } catch (e) {}
+      document.querySelectorAll('#orgSeg button').forEach(function (b) {
+        b.classList.toggle('on', b.getAttribute('data-org') === o);
+      });
+      document.getElementById('orgName').textContent = '（' + ORGS[o].label + '）';
+      document.getElementById('gform').setAttribute('action', ORGS[o].url);
+    }
+
     var CATS = [
       {label:'1.請求書',dir:true},{label:'2.領収書',dir:true},{label:'3.契約書',dir:true},
       {label:'4.通帳',dir:false},{label:'5.その他',dir:false}
@@ -161,6 +184,7 @@
       btn.disabled=false; btn.textContent='アップロード';
     });
     function flash(el,cls,t){ el.className='msg '+cls; el.textContent=t; el.style.display='block'; window.scrollTo(0,document.body.scrollHeight); }
+    pickOrg(org);
   </script>
 </body>
 </html>
