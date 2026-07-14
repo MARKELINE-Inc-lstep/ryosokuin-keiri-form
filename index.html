@@ -103,8 +103,8 @@
   <script>
     // ▼ 組織ごとのGAS /exec URL（設置時に置換）
     var ORGS = {
-      ryosokuin: { label: '両足院', url: 'PASTE_RYOSOKUIN_GAS_EXEC_URL' },
-      xexe:      { label: '是是',   url: 'PASTE_XEXE_GAS_EXEC_URL' }
+      ryosokuin: { label: '両足院', url: 'https://script.google.com/macros/s/AKfycbwQep9Mp-tI-EuTwpn1pe7aoRy9_LZD7LU1zlONLUay8hoyFz4ItwdrMcbV230ttval/exec' },
+      xexe:      { label: '是是',   url: 'https://script.google.com/macros/s/AKfycbxDhprWdltkn-6nQDHPW3S9YbYDg4NSlEFVndpTwYSQDUw-i86MKxGZcOEpoMHF2uUHzw/exec' }
     };
     var org = new URLSearchParams(location.search).get('org') || localStorage.getItem('keiri_org') || 'ryosokuin';
     if (!ORGS[org]) org = 'ryosokuin';
