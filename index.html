@@ -16,7 +16,7 @@
     label { display:block; font-size:13px; font-weight:600; margin:16px 0 6px; }
     label:first-of-type { margin-top:0; }
     .req { color:#dc2626; font-size:11px; margin-left:4px; }
-    select, input[type=text] { width:100%; padding:13px 12px; font-size:16px; border:1px solid var(--line);
+    select, input[type=text], input[type=date] { width:100%; padding:13px 12px; font-size:16px; border:1px solid var(--line);
       border-radius:10px; background:#fff; color:var(--ink); appearance:none; }
     .file-zone { border:2px dashed #c7ccd3; border-radius:12px; padding:22px 12px; text-align:center;
                  color:var(--muted); font-size:14px; background:#fafbfc; }
@@ -65,6 +65,11 @@
           </div>
         </div>
 
+        <div id="issueDateRow" style="display:none;">
+          <label>請求書発行日 <span class="req">必須</span></label>
+          <input type="date" id="issueDate">
+        </div>
+
         <label>取引先名 <span style="color:var(--muted);font-weight:400">（任意）</span></label>
         <input type="text" id="torihiki" placeholder="例）ハウスドゥ">
 
@@ -95,6 +100,7 @@
     <input type="hidden" name="direction" id="h_direction">
     <input type="hidden" name="torihiki" id="h_torihiki">
     <input type="hidden" name="memo" id="h_memo">
+    <input type="hidden" name="issueDate" id="h_issueDate">
     <input type="hidden" name="filename" id="h_filename">
     <input type="hidden" name="mimeType" id="h_mimeType">
     <input type="hidden" name="data" id="h_data">
@@ -129,6 +135,10 @@
     sel.addEventListener('change', function(){
       var need = dirMap[this.value]===true;
       document.getElementById('directionRow').style.display = need ? 'block':'none';
+      var invoice = this.value.replace(/^\d+[.．、]/, '') === '請求書';
+      document.getElementById('issueDateRow').style.display = invoice ? 'block':'none';
+      document.getElementById('issueDate').required = invoice;
+      if(!invoice) document.getElementById('issueDate').value='';
       if(!need){ direction=''; clearDir(); }
     });
     function pickDir(btn){ clearDir(); btn.classList.add('on'); direction=btn.getAttribute('data-v'); }
@@ -149,6 +159,7 @@
         document.getElementById('h_direction').value=v.direction;
         document.getElementById('h_torihiki').value=v.torihiki;
         document.getElementById('h_memo').value=v.memo;
+        document.getElementById('h_issueDate').value=v.issueDate;
         document.getElementById('h_filename').value=v.filename;
         document.getElementById('h_mimeType').value=v.mimeType;
         document.getElementById('h_data').value=v.data;
@@ -163,6 +174,7 @@
       var cat=sel.value, files=document.getElementById('files').files;
       if(!cat) return flash(msg,'ng','種類を選択してください');
       if(dirMap[cat]===true && !direction) return flash(msg,'ng','「発行」か「受領」を選択してください');
+      if(cat.replace(/^\d+[.．、]/, '') === '請求書' && !document.getElementById('issueDate').value) return flash(msg,'ng','請求書の発行日を入力してください');
       if(!files.length) return flash(msg,'ng','ファイルを選択してください');
 
       btn.disabled=true; btn.innerHTML='<span class="spin"></span>送信中…';
@@ -173,6 +185,7 @@
             category:cat, direction:direction,
             torihiki:document.getElementById('torihiki').value,
             memo:document.getElementById('memo').value,
+            issueDate:document.getElementById('issueDate').value,
             filename:files[i].name, mimeType:files[i].type||'application/octet-stream',
             data:b64
           });
@@ -180,6 +193,8 @@
         flash(msg,'ok','✅ '+files.length+'件を送信しました。数秒でGoogleドライブに保存されます。');
         document.getElementById('f').reset(); showFiles(); clearDir(); direction='';
         document.getElementById('directionRow').style.display='none';
+        document.getElementById('issueDateRow').style.display='none';
+        document.getElementById('issueDate').required=false;
       } catch(err){ flash(msg,'ng','送信エラー: '+err.message); }
       btn.disabled=false; btn.textContent='アップロード';
     });
