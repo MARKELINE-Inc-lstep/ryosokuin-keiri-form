@@ -7,13 +7,8 @@ const root = path.resolve(__dirname, '..');
 const upload = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const review = fs.readFileSync(path.join(root, 'review.html'), 'utf8');
 
-assert.match(upload, /id="issueDate"/);
-assert.match(upload, /name="issueDate"/);
-assert.match(upload, /h_issueDate/);
-assert.match(upload, /請求書の発行日を入力してください/);
-assert.match(review, /issue-date-row-/);
-assert.match(review, /issueDate: issueDate/);
-assert.match(review, /請求書の発行日を入力してください/);
+assert.doesNotMatch(upload, /issueDate|請求書発行日|発行日を入力/);
+assert.doesNotMatch(review, /issue-date|issueDate|請求書発行日|発行日を入力/);
 
 const expectedUrls = [
   'AKfycbwQep9Mp-tI-EuTwpn1pe7aoRy9_LZD7LU1zlONLUay8hoyFz4ItwdrMcbV230ttval',

@@ -17,4 +17,5 @@ URLは各1つ。ページ上部のボタンで **両足院⇔是是を切替**�
 
 - 送信先GAS: [ryosokuin-keiri-system](https://github.com/MARKELINE-Inc-lstep/ryosokuin-keiri-system)（各HTML内の `GAS_URL` / form action）
 - 仕組み: `fetch(…, {credentials:'omit'})` とフォームPOSTで匿名アクセス（Googleの複数ログインバグを回避）
+- 請求書の受領日はアップロード日として扱い、保存年月と締め区分を自動決定する（発行日の入力は不要）
 - ⚠️ 設置時に `PASTE_RYOSOKUIN_GAS_EXEC_URL` / `PASTE_XEXE_GAS_EXEC_URL` を実際の /exec URL に置換すること
