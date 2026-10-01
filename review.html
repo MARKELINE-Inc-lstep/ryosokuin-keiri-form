@@ -28,7 +28,9 @@
     .seg button.on { background:var(--accent); color:#fff; border-color:var(--accent); }
     .dirRow { display:none; }
     .go { margin-top:10px; width:100%; padding:12px; font-size:15px; font-weight:700; color:#fff; background:var(--accent); border:none; border-radius:10px; cursor:pointer; }
+    .exclude { margin-top:8px; width:100%; padding:11px; font-size:14px; font-weight:700; color:#4b5563; background:#fff; border:1px solid #cbd5e1; border-radius:10px; cursor:pointer; }
     .go:disabled { opacity:.5; }
+    .exclude:disabled { opacity:.5; }
     .r { font-size:13px; margin-top:8px; white-space:pre-wrap; }
     .r.ok { color:#065f46; } .r.ng { color:#991b1b; }
     .reload { margin:0 0 14px; padding:9px 14px; font-size:13px; border:1px solid var(--line); background:#fff; border-radius:9px; cursor:pointer; color:var(--ink); }
@@ -112,6 +114,7 @@
             '<button type="button" onclick="pickDir(this,' + i + ',\'受領\')">受領</button>' +
           '</div></div>' +
           '<button class="go" id="go-' + i + '" onclick="sortIt(' + i + ',\'' + esc(u.id) + '\')">このフォルダへ移動</button>' +
+          '<button class="exclude" id="exclude-' + i + '" onclick="excludeIt(' + i + ',\'' + esc(u.id) + '\')">対象外にする</button>' +
           '<div class="r" id="r-' + i + '"></div>' +
         '</div>';
       }).join('');
@@ -149,6 +152,26 @@
       }).catch(function(e){
         r.className = 'r ng'; r.textContent = '通信エラー: ' + e.message;
         btn.disabled = false; btn.textContent = 'このフォルダへ移動';
+      });
+    }
+
+    function excludeIt(i, fileId) {
+      if (!confirm('このファイルを未振り分けから除外します。請求書フォルダには保存されません。よろしいですか？')) return;
+      var item = document.getElementById('item-' + i);
+      var r = document.getElementById('r-' + i);
+      var buttons = item.querySelectorAll('button');
+      buttons.forEach(function(btn){ btn.disabled = true; });
+      apiPost({ action: 'exclude', fileId: fileId }).then(function(res){
+        if (res.ok) {
+          r.className = 'r ok'; r.textContent = res.message;
+          item.style.opacity = .4;
+        } else {
+          r.className = 'r ng'; r.textContent = res.message || 'エラーが発生しました';
+          buttons.forEach(function(btn){ btn.disabled = false; });
+        }
+      }).catch(function(e){
+        r.className = 'r ng'; r.textContent = '通信エラー: ' + e.message;
+        buttons.forEach(function(btn){ btn.disabled = false; });
       });
     }
 

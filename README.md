@@ -15,6 +15,8 @@ URLは各1つ。ページ上部のボタンで **両足院⇔是是を切替**�
 | アップロード | https://markeline-inc-lstep.github.io/ryosokuin-keiri-form/ |
 | 仕分け | https://markeline-inc-lstep.github.io/ryosokuin-keiri-form/review.html |
 
+請求書等の経理書類ではないファイルは、仕分け画面の「対象外にする」で未振り分け一覧・通知から除外できる。ファイルは安全のためバックエンドの対象外領域へ退避する。
+
 - 送信先GAS: [ryosokuin-keiri-system](https://github.com/MARKELINE-Inc-lstep/ryosokuin-keiri-system)（各HTML内の `GAS_URL` / form action）
 - 仕組み: `fetch(…, {credentials:'omit'})` とフォームPOSTで匿名アクセス（Googleの複数ログインバグを回避）
 - 請求書の受領日はアップロード日として扱い、保存年月と締め区分を自動決定する（発行日の入力は不要）
